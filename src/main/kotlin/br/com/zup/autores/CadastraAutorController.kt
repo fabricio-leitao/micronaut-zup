@@ -11,6 +11,7 @@ import javax.validation.Valid
 class CadastraAutorController(val autorRepository: AutorRepository) {
 
     @Post
+    @Transactional
     fun cadastra(@Body @Valid request: NovoAutorRequest){
 
         //request => domínio
@@ -21,29 +22,5 @@ class CadastraAutorController(val autorRepository: AutorRepository) {
         autorRepository.save(autor)
 
         println("Autor => ${autor.nome}")
-
-    }
-
-    @Get
-    @Transactional
-    fun lista(@QueryValue(defaultValue = "") email:String): HttpResponse<Any> {
-
-        if(email.isBlank()) {
-            val autores = autorRepository.findAll()
-
-            val resposta = autores.map { autor -> DetalhesDoAutorResponse(autor) }
-
-            return HttpResponse.ok(resposta)
-        }
-
-        //val possivelAutor = autorRepository.findByEmail(email)
-        val possivelAutor2 = autorRepository.buscaPorEmail(email)
-
-        if(possivelAutor2.isEmpty){
-            return HttpResponse.notFound()
-        }
-
-        val autor = possivelAutor2.get()
-        return HttpResponse.ok(DetalhesDoAutorResponse(autor))
     }
 }
