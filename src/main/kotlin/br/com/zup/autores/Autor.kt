@@ -8,8 +8,8 @@ import javax.persistence.Id
 
 @Entity
 class Autor(
-    val nome: String?,
-    val email: String?,
+    val nome: String,
+    val email: String,
     var descricao: String?
 ){
     @Id
