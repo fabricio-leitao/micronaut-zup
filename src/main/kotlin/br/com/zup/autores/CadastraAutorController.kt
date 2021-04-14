@@ -9,17 +9,22 @@ import javax.validation.Valid
 
 @Validated
 @Controller("/autores")
-class CadastraAutorController(val autorRepository: AutorRepository) {
+class CadastraAutorController(val autorRepository: AutorRepository, val enderecoClient: EnderecoClient) {
 
     @Post
     @Transactional
     fun cadastra(@Body @Valid request: NovoAutorRequest): HttpResponse<Any>{
-
-        //request => domínio
-
         println("Requisicao => $request")
 
-        val autor = request.toModel()
+        //fazer uma requisição para um serviço externo
+        val enderecoResponse: HttpResponse<EnderecoResponse> = enderecoClient.consulta(request.cep)
+
+        if(enderecoResponse.body() == null){
+            return HttpResponse.badRequest()
+        }
+
+        // !! confirma que com certeza vai chegar algum valor
+        val autor = request.toModel(enderecoResponse.body()!!)
         autorRepository.save(autor)
 
         println("Autor => ${autor.nome}")
